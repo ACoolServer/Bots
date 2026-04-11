@@ -1,6 +1,6 @@
 const mineflayer = require('mineflayer');
 
-const SERVER_HOST = 'your-aternos-server.aternos.me'; // your Aternos address
+const SERVER_HOST = 'ACoolServerEG.aternos.me'; // your Aternos address
 const SERVER_PORT = 25565;
 
 const botNames = ['John', 'Gibvgh'];
