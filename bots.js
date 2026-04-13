@@ -7,12 +7,18 @@ function createBot(name, reconnectInterval) {
   let bot;
   let movementInterval;
   let reconnectTimer;
+  let afkInterval;
+  let lookInterval;
 
   function cleanup() {
     if (movementInterval) clearInterval(movementInterval);
     if (reconnectTimer) clearTimeout(reconnectTimer);
+    if (afkInterval) clearInterval(afkInterval);
+    if (lookInterval) clearInterval(lookInterval);
     movementInterval = null;
     reconnectTimer = null;
+    afkInterval = null;
+    lookInterval = null;
   }
 
   function connect() {
@@ -22,7 +28,7 @@ function createBot(name, reconnectInterval) {
       host: SERVER_HOST,
       port: SERVER_PORT,
       username: name,
-      version: '1.21.11',
+      version: '1.20.1',
       hideErrors: true,
       checkTimeoutInterval: 30000
     });
@@ -31,7 +37,6 @@ function createBot(name, reconnectInterval) {
       startRandomMovement();
       if (name === 'John') startAntiAFK();
 
-      // Schedule disconnect
       reconnectTimer = setTimeout(() => {
         cleanup();
         try { bot.quit(); } catch(e) {}
@@ -41,6 +46,10 @@ function createBot(name, reconnectInterval) {
 
     bot.on('death', () => {
       try { bot.respawn(); } catch(e) {}
+    });
+
+    bot.on('health', () => {
+      try { if (bot.health <= 0) bot.respawn(); } catch(e) {}
     });
 
     bot.on('error', () => {
@@ -62,7 +71,7 @@ function createBot(name, reconnectInterval) {
     const controls = ['forward', 'back', 'left', 'right'];
 
     movementInterval = setInterval(() => {
-      if (!bot || !bot.entity) return; // safety check
+      if (!bot || !bot.entity) return;
 
       controls.forEach(c => bot.setControlState(c, false));
       const randomDir = controls[Math.floor(Math.random() * controls.length)];
@@ -75,17 +84,31 @@ function createBot(name, reconnectInterval) {
         }, 500);
       }
 
-    }, 2000); // slower = less RAM
+    }, 2000);
   }
 
   function startAntiAFK() {
-    setInterval(() => {
+    // Swing arm silently
+    afkInterval = setInterval(() => {
       try { bot.swingArm(); } catch(e) {}
-    }, 60000); // every 1 min
+    }, 60000);
 
-    setInterval(() => {
-      try { bot.chat('.'); } catch(e) {}
+    // Look around silently instead of chatting
+    lookInterval = setInterval(() => {
+      try {
+        bot.look(Math.random() * Math.PI * 2, 0, true);
+      } catch(e) {}
     }, 600000);
+
+    // Sneak every 2 minutes
+    setInterval(() => {
+      try {
+        bot.setControlState('sneak', true);
+        setTimeout(() => {
+          try { bot.setControlState('sneak', false); } catch(e) {}
+        }, 2000);
+      } catch(e) {}
+    }, 120000);
   }
 
   connect();
