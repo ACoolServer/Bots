@@ -114,5 +114,5 @@ function createBot(name, reconnectInterval) {
   connect();
 }
 
-createBot('Ronaldo_Son', 10 * 60 * 1000);
-setTimeout(() => createBot('Messi', 5 * 60 * 1000), 5000);
+createBot('John', 10 * 60 * 1000);
+setTimeout(() => createBot('Egypt', 5 * 60 * 1000), 5000);
