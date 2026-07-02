@@ -9,16 +9,19 @@ function createBot(name, reconnectInterval) {
   let reconnectTimer;
   let afkInterval;
   let lookInterval;
+  let sneakInterval;
 
   function cleanup() {
     if (movementInterval) clearInterval(movementInterval);
     if (reconnectTimer) clearTimeout(reconnectTimer);
     if (afkInterval) clearInterval(afkInterval);
     if (lookInterval) clearInterval(lookInterval);
+    if (sneakInterval) clearInterval(sneakInterval);
     movementInterval = null;
     reconnectTimer = null;
     afkInterval = null;
     lookInterval = null;
+    sneakInterval = null;
   }
 
   function connect() {
@@ -88,20 +91,17 @@ function createBot(name, reconnectInterval) {
   }
 
   function startAntiAFK() {
-    // Swing arm silently
     afkInterval = setInterval(() => {
       try { bot.swingArm(); } catch(e) {}
     }, 60000);
 
-    // Look around silently instead of chatting
     lookInterval = setInterval(() => {
       try {
         bot.look(Math.random() * Math.PI * 2, 0, true);
       } catch(e) {}
     }, 600000);
 
-    // Sneak every 2 minutes
-    setInterval(() => {
+    sneakInterval = setInterval(() => {
       try {
         bot.setControlState('sneak', true);
         setTimeout(() => {
@@ -114,5 +114,8 @@ function createBot(name, reconnectInterval) {
   connect();
 }
 
-createBot('John', 10 * 60 * 1000);
-setTimeout(() => createBot('Egypt', 5 * 60 * 1000), 5000);
+// 60 minutes = 60 * 60 * 1000 = 3600000 ms
+const ONE_HOUR = 60 * 60 * 1000;
+
+createBot('John', ONE_HOUR);
+setTimeout(() => createBot('Egypt', ONE_HOUR), 5000);
