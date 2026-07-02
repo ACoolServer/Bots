@@ -1,11 +1,12 @@
 {
-  "name": "mc-bots",
+  "name": "mineflayer-bots",
   "version": "1.0.0",
-  "main": "bots.js",
+  "description": "",
+  "main": "index.js",
   "scripts": {
-    "start": "node bots.js"
+    "start": "node index.js"
   },
   "dependencies": {
-    "mineflayer": "^4.23.0"
+    "mineflayer": "^4.20.1"
   }
 }
